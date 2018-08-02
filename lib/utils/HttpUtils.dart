@@ -26,11 +26,16 @@ class HttpUtils {
 
   Future<String> get(path, {data}) async {
     Response response =  await dio.get(path, data: data);
-    return JSON.decode(response.data.toString());
+    return response.data;
   }
 
-  Future<String> post(path,{data}) async{
-    Response response =  await dio.post(path,data: data);
-    return response.data.toString();
+  Future<Map> post(path,{data}) async{
+    Response response =  await dio.post(path,data: FormData.from(data));
+    return response.data;
+  }
+
+  setHeader(header){
+    options.headers = header;
+    dio = Dio(options);
   }
 }

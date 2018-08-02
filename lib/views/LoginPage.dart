@@ -16,33 +16,15 @@ class LoginPageState extends State<LoginPage> {
   String pwd;
 
   _login() async {
-    Map json = {"username": name, "pwd": pwd};
-    int code;
-//    try {
-//      http
-//          .post("http://192.168.30.21:8000/user/login", body: json)
-//          .then((response) {
-//        response.headers;
-//        var json = response.body;
-//        var data = JSON.decode(json);
-//        code = data['code'];
-//        print("code == $code");
-//        if (code == 0) {
-//          Navigator.push(
-//            context,
-//            new MaterialPageRoute(builder: (context) => new MainPage()),
-//          );
-//        }
-//      });
-//    } catch (exception) {
-//      print(exception);
-//    }
 
-    String res = await HttpUtils.getInstance().get("/user/login", data: json);
-    var data = JSON.decode(res);
-    code = data['code'];
+    int code;
+
+    var res = await HttpUtils.getInstance().post("/user/login", data: {"username": name, "pwd": pwd});
+    code = res['code'];
     print("code == $code");
     if (code == 0) {
+      var token = res['token'];
+      HttpUtils.getInstance().setHeader({"token":token});
       Navigator.push(
         context,
         new MaterialPageRoute(builder: (context) => new MainPage()),
