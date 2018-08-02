@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'MainPage.dart';
+import 'package:idota/utils/HttpUtils.dart';
 
 class ResgiterPage extends StatefulWidget {
   @override
@@ -15,23 +13,16 @@ class ResgiterPageState extends State<ResgiterPage> {
   String pwd;
 
   _resgiter() async {
-    Map json = {"username": name, "pwd": pwd, "email": email};
     int code;
     try {
-      http
-          .post("http://192.168.30.21:8000/user/resgiter", body: json)
-          .then((response) {
-        response.headers;
-        var json = response.body;
-        var data = JSON.decode(json);
-        code = data['code'];
+        var json = await HttpUtils.getInstance().post("/user/resgiter",data: {"username": name, "pwd": pwd, "email": email});
+        code = json['code'];
         print("code == $code");
         if (code == 0) {
           Navigator.pop(context);
         } else {
-          print(data['msg']);
+          print(json['msg']);
         }
-      });
     } catch (exception) {
       print(exception);
     }
