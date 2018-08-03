@@ -24,7 +24,7 @@ class HttpUtils {
     dio = Dio(options);
   }
 
-  Future<String> get(path, {data}) async {
+  Future<Map> get(path, {data}) async {
     Response response =  await dio.get(path, data: data);
     return response.data;
   }

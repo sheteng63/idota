@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'WebViewPage.dart';
+import 'package:idota/views/BlogDetailPage.dart';
 import 'dart:async';
+import 'package:idota/utils/HttpUtils.dart';
 
 class HotPage extends StatefulWidget {
   @override
@@ -9,63 +10,98 @@ class HotPage extends StatefulWidget {
 
 class _HotPageState extends State<HotPage> {
   int index = 10;
+  List blogs = List();
+
+  _favorite(id) async{
+    print("_favorite");
+    await HttpUtils.getInstance().get("/blog/favorite",data: {"id": id});
+    setState(() {
+
+    });
+  }
+
+  _getData() async {
+    var json = await HttpUtils.getInstance().get("/blog/list");
+    var listBlog = json['content'];
+    setState(() {
+      for (var blog in listBlog) {
+        blogs.add(blog);
+      }
+    });
+  }
 
   Widget _builItem(BuildContext context, int index) {
+    var blog = blogs[index];
     return new GestureDetector(
       child: new Container(
-        margin: const EdgeInsets.all(5.0),
         padding: const EdgeInsets.all(5.0),
-        height: 150.0,
+        margin: const EdgeInsets.all(5.0),
         decoration: new BoxDecoration(
-            image: new DecorationImage(
-                image: new NetworkImage(
-                  "http://c.hiphotos.baidu.com/image/h%3D300/sign=e3b76ad36081800a71e58f0e813433d6/d50735fae6cd7b89acbea9df032442a7d8330e9f.jpg",
-                ),
-                fit: BoxFit.cover)),
-        child: new Row(
+          color: Colors.white,
+          border: new Border.all(
+            color: Colors.yellow,
+            width: 1.0,
+          ),
+          borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+        ),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new Flexible(
-              flex: 4,
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            new Text(
+              blog["title"],
+              style: new TextStyle(
+                  fontSize: 18.0, color: Theme.of(context).primaryColor),
+            ),
+            new Text(
+              blog["body"],
+              maxLines: 2,
+              style: new TextStyle(fontSize: 15.0),
+            ),
+            Align(
+              alignment: FractionalOffset.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  new Flexible(
-                    child: new Text(
-                      "NATIVEONDRAW",
-                      style: new TextStyle(
-                          fontSize: 18.0,
-                          color: Theme.of(context).primaryColor),
-                    ),
-                    flex: 1,
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        blog["pageViews"].toString(),
+                        style: new TextStyle(fontSize: 12.0),
+                      ),
+                      Icon(
+                        Icons.remove_red_eye,
+                        color: Theme.of(context).primaryColor,
+                        size: 12.0,
+                      ),
+                    ],
                   ),
-                  new Flexible(
-                    flex: 1,
-                    child: new Text(
-                      "nativeOnDraw failed; clearing to background color",
-                      style: new TextStyle(fontSize: 15.0),
+                  GestureDetector(
+                    child: Row(
+                      children: <Widget>[
+                        Text(blog["favorite"].toString(),
+                            style: new TextStyle(fontSize: 12.0)),
+                        Icon(
+                          Icons.favorite_border,
+                          size: 12.0,
+                        ),
+                      ],
                     ),
+                    onTap: () {
+                      _favorite(blog["id"]);
+                    },
                   )
                 ],
               ),
-            ),
-            new Flexible(
-              flex: 1,
-              child: new Icon(
-                Icons.arrow_forward,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
+            )
           ],
         ),
       ),
       onTap: () {
+        _pageView(blog["id"]);
         Navigator
             .of(context)
             .push(new MaterialPageRoute(builder: (BuildContext context) {
-          return new WebViewPage(
-            url: "http://www.wanmei.com",
-            title: "完美",
-          );
+          return BlogDetailPage(blog: blog);
         }));
       },
     );
@@ -74,29 +110,30 @@ class _HotPageState extends State<HotPage> {
   Future<Null> _onRefresh() async {
     print("下拉刷新");
     setState(() {
-      index = 10;
+      blogs.clear();
     });
+    _getData();
   }
 
   var _scrollCon = ScrollController();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _scrollCon.addListener(() {
       if (_scrollCon.position.pixels == _scrollCon.position.maxScrollExtent) {
         print("加载更多");
-        setState(() {
-          index += 10;
-        });
+//        setState(() {
+//          index += 10;
+//        });
       }
     });
+    blogs.clear();
+    _getData();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _scrollCon.dispose();
   }
@@ -105,11 +142,16 @@ class _HotPageState extends State<HotPage> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       child: new ListView.builder(
-        itemCount: index,
+        itemCount: blogs.length,
         itemBuilder: _builItem,
         controller: _scrollCon,
       ),
       onRefresh: _onRefresh,
     );
+  }
+
+  _pageView(id) async {
+    var json =
+        await HttpUtils.getInstance().get("/blog/pageView", data: {"id": id});
   }
 }

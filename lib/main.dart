@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'views/WebViewPage.dart';
 import 'views/LoginPage.dart';
 import 'views/ResgiterPage.dart';
+import 'views/MainPage.dart';
 
 void main() {
   runApp(new MaterialApp(
@@ -13,6 +14,6 @@ void main() {
       "/resgiter": (_) => new ResgiterPage()
     },
     title: 'Flutter Demo',
-    home: new LoginPage(),
+    home: new MainPage(),
   ));
 }
