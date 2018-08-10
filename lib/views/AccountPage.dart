@@ -48,9 +48,7 @@ class _AccountPageState extends State<AccountPage> {
       this._image = res['data']['img'];
       setState(() {});
     } else {
-      Scaffold.of(context).showSnackBar(new SnackBar(
-            content: new Text('获取个人信息失败'),
-          ));
+
     }
   }
 
@@ -70,7 +68,15 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
+    HttpUtils.getInstance().startDio();
     _isLogin();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    HttpUtils.getInstance().stopDio();
   }
 
   @override
@@ -244,4 +250,6 @@ class _AccountPageState extends State<AccountPage> {
             ),
           );
   }
+
+
 }

@@ -47,4 +47,14 @@ class HttpUtils {
     options.headers = header;
     dio = Dio(options);
   }
+
+  void stopDio(){
+    dio.interceptor.request.onSend = (Options options){
+      return dio.resolve({});
+    };
+  }
+
+  void startDio(){
+    dio.interceptor.request.onSend = null;
+  }
 }

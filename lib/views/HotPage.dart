@@ -122,6 +122,7 @@ class _HotPageState extends State<HotPage> {
   @override
   void initState() {
     super.initState();
+    HttpUtils.getInstance().startDio();
     _scrollCon.addListener(() {
       if (_scrollCon.position.pixels == _scrollCon.position.maxScrollExtent) {
         print("加载更多");
@@ -138,6 +139,7 @@ class _HotPageState extends State<HotPage> {
   void dispose() {
     super.dispose();
     _scrollCon.dispose();
+    HttpUtils.getInstance().stopDio();
   }
 
   @override
