@@ -12,22 +12,24 @@ class _HotPageState extends State<HotPage> {
   int index = 10;
   List blogs = List();
 
-  _favorite(id) async{
+  _favorite(id) async {
     print("_favorite");
-    await HttpUtils.getInstance().get("/blog/favorite",data: {"id": id});
-    setState(() {
-
-    });
+    await HttpUtils.getInstance().post("/blog/favorite", data: {"id": id});
+    setState(() {});
   }
 
   _getData() async {
     var json = await HttpUtils.getInstance().get("/blog/list");
-    var listBlog = json['content'];
-    setState(() {
-      for (var blog in listBlog) {
-        blogs.add(blog);
+    print(json);
+    if (json['code'] == 0) {
+      var listBlog = json['content'];
+      if (listBlog != null) {
+        for (var blog in listBlog) {
+          blogs.add(blog);
+        }
+        setState(() {});
       }
-    });
+    }
   }
 
   Widget _builItem(BuildContext context, int index) {
@@ -97,12 +99,12 @@ class _HotPageState extends State<HotPage> {
         ),
       ),
       onTap: () {
-        _pageView(blog["id"]);
         Navigator
             .of(context)
             .push(new MaterialPageRoute(builder: (BuildContext context) {
           return BlogDetailPage(blog: blog);
         }));
+        _pageView(blog["id"]);
       },
     );
   }
@@ -152,6 +154,6 @@ class _HotPageState extends State<HotPage> {
 
   _pageView(id) async {
     var json =
-        await HttpUtils.getInstance().get("/blog/pageView", data: {"id": id});
+        await HttpUtils.getInstance().post("/blog/pageView", data: {"id": id});
   }
 }

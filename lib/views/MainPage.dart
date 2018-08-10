@@ -2,7 +2,7 @@ import 'HotPage.dart';
 import 'AccountPage.dart';
 import 'AttentionPage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:idota/utils/AppStatus.dart';
 
 class MainPage extends StatefulWidget {
 	@override
@@ -16,6 +16,7 @@ class MainPageState extends State<MainPage>
 	void initState() {
 		super.initState();
 		tabController = new TabController(length: 3, vsync: this);
+		AppStatus.getInstance().initHeader();
 	}
 	
 	@override

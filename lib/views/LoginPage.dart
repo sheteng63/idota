@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'MainPage.dart';
 import 'package:idota/utils/HttpUtils.dart';
-
+import 'package:idota/utils/AppStatus.dart';
 class LoginPage extends StatefulWidget {
   @override
   createState() => new LoginPageState();
@@ -24,11 +22,8 @@ class LoginPageState extends State<LoginPage> {
     print("code == $code");
     if (code == 0) {
       var token = res['token'];
-      HttpUtils.getInstance().setHeader({"token":token});
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new MainPage()),
-      );
+      AppStatus.getInstance().saveToken(token);
+      Navigator.of(context).pop(true);
     }
   }
 

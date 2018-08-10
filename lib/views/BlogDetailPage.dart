@@ -24,6 +24,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       body: Column(
         children: <Widget>[
           Text(blog["body"]),
+
         ],
       ),
     );
