@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:idota/views/NewBlogPage.dart';
+import 'package:idota/views/UploadImagePage.dart';
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
 import 'package:idota/utils/AppStatus.dart';
@@ -18,16 +19,9 @@ class _AccountPageState extends State<AccountPage> {
   String _image;
 
   Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
-    var res = await HttpUtils.getInstance().post("/user/uploadImg",
-        data: {'img': new UploadFileInfo(image, "upload.jpg")});
-    String tRes = "上传失败";
-    if (res['code'] == 0) {
-      tRes = "上传成功";
-    }
-    Scaffold.of(context).showSnackBar(new SnackBar(
-          content: Text(tRes),
-        ));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return UploadImagePage();
+    }));
   }
 
   void _isLogin() async {
@@ -46,15 +40,14 @@ class _AccountPageState extends State<AccountPage> {
     if (res['code'] == 0) {
       this._name = res['data']['name'];
       this._image = res['data']['img'];
-      setState(() {});
-    } else {
-
-    }
+      if (mounted) {
+        setState(() {});
+      }
+    } else {}
   }
 
   void _login() async {
-    Navigator
-        .of(context)
+    Navigator.of(context)
         .push(new MaterialPageRoute(builder: (BuildContext context) {
       return LoginPage();
     })).then((value) {
@@ -68,7 +61,6 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
-    HttpUtils.getInstance().startDio();
     _isLogin();
   }
 
@@ -76,180 +68,203 @@ class _AccountPageState extends State<AccountPage> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    HttpUtils.getInstance().stopDio();
   }
 
   @override
   Widget build(BuildContext context) {
     return _islogin
         ? Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              GestureDetector(
+                child: _image == null
+                    ? Icon(
+                  Icons.account_circle,
+                  size: 70.0,
+                )
+                    : ClipOval(
+                    child: SizedBox(
+                      width: 70.0,
+                      height: 70.0,
+                      // ignore: ambiguous_import
+                      child: Image.network(HttpUtils.IMG_URL + _image),
+                    )),
+                onTap: getImage,
+              ),
+              Flexible(
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          _name,
+                          maxLines: 1,
+                        ),
+                        Text(
+                          "签名",
+                          maxLines: 1,
+                        )
+                      ],
+                    )),
+              )
+            ],
+          ),
+          new Padding(
+            padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+            child: new Row(
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    GestureDetector(
-                      child: _image == null
-                          ? Icon(
-                              Icons.account_circle,
-                              size: 70.0,
-                            )
-                          : ClipOval(
-                              child: SizedBox(
-                              width: 70.0,
-                              height: 70.0,
-                              child: Image.network(HttpUtils.IMG_URL + _image),
-                            )),
-                      onTap: getImage,
-                    ),
-                    Flexible(
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                _name,
-                                maxLines: 1,
-                              ),
-                              Text(
-                                "签名",
-                                maxLines: 1,
-                              )
-                            ],
-                          )),
-                    )
-                  ],
-                ),
-                new Padding(
-                  padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                  child: new Row(
-                    children: <Widget>[
-                      new Expanded(
-                          child: new OutlineButton(
-                            borderSide: new BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            child: new Text(
-                              '新心情',
-                              style: new TextStyle(
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                            onPressed: () {
-
-                            },
-                          )),
-                    ],
-                  ),
-                ),
-                new Padding(
-                  padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                  child: new Row(
-                    children: <Widget>[
-                      new Expanded(
-                          child: new OutlineButton(
-                        borderSide: new BorderSide(
-                            color: Theme.of(context).primaryColor),
-                        child: new Text(
-                          '我参与的',
-                          style: new TextStyle(
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {},
-                      )),
-
-                    ],
-                  ),
-                ),
-                new Padding(
-                  padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                  child: new Row(
-                    children: <Widget>[
-                      new Expanded(
-                          child: new OutlineButton(
-                        borderSide: new BorderSide(
-                            color: Theme.of(context).primaryColor),
-                        child: new Text(
-                          '关注记录',
-                          style: new TextStyle(
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {},
-                      )),
-                    ],
-                  ),
-                ),
-                new Padding(
-                  padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                  child: new Row(
-                    children: <Widget>[
-                      new Expanded(
-                          child: new OutlineButton(
-                        borderSide: new BorderSide(
-                            color: Theme.of(context).primaryColor),
-                        child: new Text(
-                          '浏览历史',
-                          style: new TextStyle(
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {},
-                      )),
-                    ],
-                  ),
-                ),
-                new Padding(
-                  padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                  child: new Row(
-                    children: <Widget>[
-                      new Expanded(
-                          child: new OutlineButton(
-                        borderSide: new BorderSide(
-                            color: Theme.of(context).primaryColor),
-                        child: new Text(
-                          '退出登录',
-                          style: new TextStyle(
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {
-                          AppStatus.getInstance().clearToken();
-                          _isLogin();
-                        },
-                      )),
-                    ],
-                  ),
-                ),
+                new Expanded(
+                    child: new OutlineButton(
+                      borderSide: new BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
+                      child: new Text(
+                        '新心情',
+                        style: new TextStyle(
+                            color: Theme
+                                .of(context)
+                                .primaryColor),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return NewBlogPage();
+                        }));
+                      },
+                    )),
+              ],
+            ),
+          ),
+          new Padding(
+            padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new OutlineButton(
+                      borderSide: new BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
+                      child: new Text(
+                        '我参与的',
+                        style: new TextStyle(
+                            color: Theme
+                                .of(context)
+                                .primaryColor),
+                      ),
+                      onPressed: () {},
+                    )),
+              ],
+            ),
+          ),
+          new Padding(
+            padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new OutlineButton(
+                      borderSide: new BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
+                      child: new Text(
+                        '关注记录',
+                        style: new TextStyle(
+                            color: Theme
+                                .of(context)
+                                .primaryColor),
+                      ),
+                      onPressed: () {},
+                    )),
+              ],
+            ),
+          ),
+          new Padding(
+            padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new OutlineButton(
+                      borderSide: new BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
+                      child: new Text(
+                        '浏览历史',
+                        style: new TextStyle(
+                            color: Theme
+                                .of(context)
+                                .primaryColor),
+                      ),
+                      onPressed: () {},
+                    )),
+              ],
+            ),
+          ),
+          new Padding(
+            padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new OutlineButton(
+                      borderSide: new BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
+                      child: new Text(
+                        '退出登录',
+                        style: new TextStyle(
+                            color: Theme
+                                .of(context)
+                                .primaryColor),
+                      ),
+                      onPressed: () {
+                        AppStatus.getInstance().clearToken();
+                        _isLogin();
+                      },
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
+    )
+        : Padding(
+      padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+      child: Column(
+        children: <Widget>[
+          Icon(
+            Icons.account_circle,
+            size: 70.0,
+          ),
+          Padding(
+            padding: new EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 10.0),
+            child: Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new OutlineButton(
+                      borderSide: new BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
+                      child: new Text(
+                        '点击登录',
+                        style: new TextStyle(
+                            color: Theme
+                                .of(context)
+                                .primaryColor),
+                      ),
+                      onPressed: _login,
+                    )),
               ],
             ),
           )
-        : Padding(
-            padding: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.account_circle,
-                  size: 70.0,
-                ),
-                Padding(
-                  padding: new EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 10.0),
-                  child: Row(
-                    children: <Widget>[
-                      new Expanded(
-                          child: new OutlineButton(
-                            borderSide: new BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            child: new Text(
-                              '点击登录',
-                              style: new TextStyle(
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                            onPressed: _login,
-                          )),
-                    ],
-                  ),
-                )
-
-              ],
-            ),
-          );
+        ],
+      ),
+    );
   }
-
-
 }

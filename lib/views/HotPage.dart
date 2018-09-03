@@ -15,7 +15,6 @@ class _HotPageState extends State<HotPage> {
   _favorite(id) async {
     print("_favorite");
     await HttpUtils.getInstance().post("/blog/favorite", data: {"id": id});
-    setState(() {});
   }
 
   _getData() async {
@@ -27,93 +26,136 @@ class _HotPageState extends State<HotPage> {
         for (var blog in listBlog) {
           blogs.add(blog);
         }
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     }
   }
 
   Widget _builItem(BuildContext context, int index) {
     var blog = blogs[index];
-    return new GestureDetector(
-      child: new Container(
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.all(5.0),
-        decoration: new BoxDecoration(
-          color: Colors.white,
-          border: new Border.all(
-            color: Colors.yellow,
-            width: 1.0,
-          ),
-          borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+    return new Container(
+      padding: const EdgeInsets.all(5.0),
+      margin: const EdgeInsets.all(5.0),
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        border: new Border.all(
+          color: Colors.yellow,
+          width: 1.0,
         ),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Text(
-              blog["title"],
-              style: new TextStyle(
-                  fontSize: 18.0, color: Theme.of(context).primaryColor),
-            ),
-            new Text(
-              blog["body"],
-              maxLines: 2,
-              style: new TextStyle(fontSize: 15.0),
-            ),
-            Align(
-              alignment: FractionalOffset.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        blog["pageViews"].toString(),
-                        style: new TextStyle(fontSize: 12.0),
-                      ),
-                      Icon(
-                        Icons.remove_red_eye,
-                        color: Theme.of(context).primaryColor,
-                        size: 12.0,
-                      ),
-                    ],
-                  ),
-                  GestureDetector(
-                    child: Row(
-                      children: <Widget>[
-                        Text(blog["favorite"].toString(),
-                            style: new TextStyle(fontSize: 12.0)),
-                        Icon(
-                          Icons.favorite_border,
-                          size: 12.0,
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      _favorite(blog["id"]);
-                    },
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+        borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
       ),
-      onTap: () {
-        Navigator
-            .of(context)
-            .push(new MaterialPageRoute(builder: (BuildContext context) {
-          return BlogDetailPage(blog: blog);
-        }));
-        _pageView(blog["id"]);
-      },
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              blog["authorImg"] != null
+                  ? ClipOval(
+                      child: SizedBox(
+                      width: 20.0,
+                      height: 20.0,
+                      child: Image.network(
+                        HttpUtils.IMG_URL + blog["authorImg"],
+                      ),
+                    ))
+                  : Icon(
+                      Icons.account_circle,
+                      size: 20.0,
+                    ),
+              Expanded(
+                child: Text(
+                  blog["authorName"],
+                  maxLines: 1,
+                ),
+              ),
+              Text(
+                blog['date'],
+                style: TextStyle(
+                  fontSize: 12.0,
+                ),
+              ),
+            ],
+          ),
+          GestureDetector(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: new Text(
+                        blog["body"],
+                        maxLines: 1,
+                        style: new TextStyle(
+                            fontSize: 18.0,
+                            color: Theme.of(context).primaryColor),
+                      ),
+                    )
+                  ],
+                ),
+                Image.network(
+                  HttpUtils.IMG_URL + blog['image']
+                )
+              ],
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(new MaterialPageRoute(builder: (BuildContext context) {
+                return BlogDetailPage(blog: blog);
+              }));
+              _pageView(blog["id"]);
+            },
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      blog["pageViews"].toString(),
+                      style: new TextStyle(fontSize: 12.0),
+                    ),
+                    Icon(
+                      Icons.remove_red_eye,
+                      color: Theme.of(context).primaryColor,
+                      size: 12.0,
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Text(blog["favorite"].toString(),
+                        style: new TextStyle(fontSize: 12.0)),
+                    blog['favorite'] > 0
+                        ? Icon(
+                            Icons.favorite,
+                            size: 12.0,
+                            color: Colors.redAccent,
+                          )
+                        : Icon(
+                            Icons.favorite_border,
+                            size: 12.0,
+                            color: Colors.redAccent,
+                          )
+                  ],
+                ),
+                onTap: () {
+                  _favorite(blog["id"]);
+                },
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 
   Future<Null> _onRefresh() async {
     print("下拉刷新");
-    setState(() {
-      blogs.clear();
-    });
+    blogs.clear();
     _getData();
   }
 
@@ -122,7 +164,6 @@ class _HotPageState extends State<HotPage> {
   @override
   void initState() {
     super.initState();
-    HttpUtils.getInstance().startDio();
     _scrollCon.addListener(() {
       if (_scrollCon.position.pixels == _scrollCon.position.maxScrollExtent) {
         print("加载更多");
@@ -139,7 +180,6 @@ class _HotPageState extends State<HotPage> {
   void dispose() {
     super.dispose();
     _scrollCon.dispose();
-    HttpUtils.getInstance().stopDio();
   }
 
   @override

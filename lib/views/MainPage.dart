@@ -43,7 +43,7 @@ class MainPageState extends State<MainPage>
 					),
 					new BottomNavigationBarItem(
 						icon: new Icon(Icons.account_balance_wallet),
-						title: new Text("关注"),
+						title: new Text("动态"),
 						backgroundColor: Theme.of(context).primaryColor,
 					),
 					new BottomNavigationBarItem(

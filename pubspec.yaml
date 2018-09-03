@@ -10,9 +10,13 @@ dependencies:
   cupertino_icons: ^0.1.0
   http: '>=0.11.3+12'
   url_launcher: "^3.0.0"
-  dio: "0.1.8"
+  dio: ^1.0.1
   image_picker: "^0.4.6"
   shared_preferences: "^0.4.2"
+  fluttertoast: ^2.0.7
+  path_provider: ^0.4.1
+  image_compress:
+            path: ../image_compress/
 
 dev_dependencies:
   flutter_test:
